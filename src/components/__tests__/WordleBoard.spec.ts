@@ -22,10 +22,26 @@ describe('WordleBoard', () => {
       expect(wrapper.text()).toContain(VICTORY_MESSAGE)
     })
 
-    it('a defeat message appears if the user makes a guess that is incorrect', async () => {
-      await playerSubmitsGuess('WRONG')
+    describe.each([
+      { numberOfGuesses: 0, shouldSeeDefeatMessage: false },
+      { numberOfGuesses: 1, shouldSeeDefeatMessage: false },
+      { numberOfGuesses: 2, shouldSeeDefeatMessage: false },
+      { numberOfGuesses: 3, shouldSeeDefeatMessage: false },
+      { numberOfGuesses: 4, shouldSeeDefeatMessage: false },
+      { numberOfGuesses: 5, shouldSeeDefeatMessage: false },
+      { numberOfGuesses: 6, shouldSeeDefeatMessage: true }
+    ])('a defeat message appears if the user makes a guess that is incorrect', ({ numberOfGuesses, shouldSeeDefeatMessage }) => {
+      it(`therefore for ${numberOfGuesses} guess(es), a defeat message should ${shouldSeeDefeatMessage ? "" : "not"} appear`, async () => {
+        for (let i = 0; i < numberOfGuesses; i++) {
+          await playerSubmitsGuess("WRONG")
+        }
 
-      expect(wrapper.text()).toContain(DEFEAT_MESSAGE)
+        if (shouldSeeDefeatMessage) {
+          expect(wrapper.text()).toContain(DEFEAT_MESSAGE)
+        } else {
+          expect(wrapper.text()).not.toContain(DEFEAT_MESSAGE)
+        }
+      })
     })
 
     it('no end-of-game message appears if the user has not yet made a guess', () => {

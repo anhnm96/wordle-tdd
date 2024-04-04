@@ -7,20 +7,20 @@ import englishWords from '@/englishWordsWith5Letters.json'
 defineProps({
   wordOfTheDay: {
     type: String,
+    required: true,
     validator: (wordGiven: string) => englishWords.includes(wordGiven)
   }
 })
 
-const guessSubmitted = ref('')
+const guessSubmitted = ref<string[]>([])
 </script>
 
 <template>
   <main>
-    <GuessInput @guess-submitted="(guess: string) => guessSubmitted = guess" />
-    <template v-if="guessSubmitted.length > 0">
-      <p v-if="guessSubmitted === wordOfTheDay">{{ VICTORY_MESSAGE }}</p>
-      <p v-else>{{ DEFEAT_MESSAGE }}</p>
-    </template>
+    <GuessInput @guess-submitted="(guess: string) => guessSubmitted.push(guess)" />
+    <p class="end-of-game-message" v-if="guessSubmitted.length === 6 || guessSubmitted.includes(wordOfTheDay)">
+      {{ guessSubmitted.includes(wordOfTheDay) ? VICTORY_MESSAGE : DEFEAT_MESSAGE }}
+    </p>
   </main>
 </template>
 
