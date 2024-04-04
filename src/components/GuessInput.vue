@@ -25,6 +25,12 @@ function onSubmit() {
   if (!englishWords.includes(formattedGuessInProgress.value)) return
   emit('guess-submitted', formattedGuessInProgress.value)
 }
+
+async function blur(event: Event) {
+  setTimeout(() => {
+    (event.target as HTMLInputElement).focus()
+  })
+}
 </script>
 
 <template>
@@ -33,8 +39,8 @@ function onSubmit() {
       :data-letter="letter" class="letter" v-text="letter" />
   </ul>
 
-  <input type="text" :maxlength="WORD_SIZE" autofocus @blur="({ target }) => (target as HTMLInputElement).focus()"
-    v-model="formattedGuessInProgress" @keydown.enter="onSubmit">
+  <input type="text" :maxlength="WORD_SIZE" autofocus @blur="blur" v-model="formattedGuessInProgress"
+    @keydown.enter="onSubmit">
 </template>
 
 <style scoped>
