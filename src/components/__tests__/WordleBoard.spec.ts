@@ -1,7 +1,6 @@
 import { mount } from '@vue/test-utils'
 import WordleBoard from '../WordleBoard.vue'
 import { DEFEAT_MESSAGE, MAX_GUESSES_COUNT, VICTORY_MESSAGE, WORD_SIZE } from '@/settings'
-import GuessInput from '../GuessInput.vue'
 import { nextTick } from 'vue'
 
 describe('WordleBoard', () => {
@@ -32,13 +31,13 @@ describe('WordleBoard', () => {
           shouldSeeTheDefeatMessage: numberOfGuesses === MAX_GUESSES_COUNT
         })
       )
-    )(`a defeat message appears if the user makes incorrect guesses ${MAX_GUESSES_COUNT} times in a row`, ({ numberOfGuesses, shouldSeeDefeatMessage }) => {
-      it(`therefore for ${numberOfGuesses} guess(es), a defeat message should ${shouldSeeDefeatMessage ? "" : "not"} appear`, async () => {
+    )(`a defeat message appears if the user makes incorrect guesses ${MAX_GUESSES_COUNT} times in a row`, ({ numberOfGuesses, shouldSeeTheDefeatMessage }) => {
+      it(`therefore for ${numberOfGuesses} guess(es), a defeat message should ${shouldSeeTheDefeatMessage ? "" : "not"} appear`, async () => {
         for (let i = 0; i < numberOfGuesses; i++) {
           await playerSubmitsGuess("WRONG")
         }
 
-        if (shouldSeeDefeatMessage) {
+        if (shouldSeeTheDefeatMessage) {
           expect(wrapper.text()).toContain(DEFEAT_MESSAGE)
         } else {
           expect(wrapper.text()).not.toContain(DEFEAT_MESSAGE)
@@ -117,6 +116,25 @@ describe('WordleBoard', () => {
       await playerSubmitsGuess('123')
 
       expect(wrapper.find<HTMLInputElement>('input[type=text]').element.value).toEqual('')
+    })
+
+    it('all previous guesses done by the player are visible in the page', async () => {
+      const guesses = [
+        'WRONG',
+        'GUESS',
+        'HELLO',
+        'WORLD',
+        'HAPPY',
+        'CODER'
+      ]
+
+      for (const guess of guesses) {
+        await playerSubmitsGuess(guess)
+      }
+
+      for (const guess of guesses) {
+        expect(wrapper.text()).toContain(guess)
+      }
     })
   })
 })

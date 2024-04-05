@@ -12,16 +12,21 @@ const props = defineProps({
   }
 })
 
-const guessSubmitted = ref<string[]>([])
+const guessesSubmitted = ref<string[]>([])
 
-const isGameOver = computed(() => guessSubmitted.value.length === MAX_GUESSES_COUNT || guessSubmitted.value.includes(props.wordOfTheDay))
+const isGameOver = computed(() => guessesSubmitted.value.length === MAX_GUESSES_COUNT || guessesSubmitted.value.includes(props.wordOfTheDay))
 </script>
 
 <template>
   <main>
-    <GuessInput @guess-submitted="(guess: string) => guessSubmitted.push(guess)" />
+    <ul>
+      <li v-for="(guess, index) in guessesSubmitted" :key="`${index}-${guess}`">
+        {{ guess }}
+      </li>
+    </ul>
+    <GuessInput @guess-submitted="(guess: string) => guessesSubmitted.push(guess)" />
     <p class="end-of-game-message" v-if="isGameOver">
-      {{ guessSubmitted.includes(wordOfTheDay) ? VICTORY_MESSAGE : DEFEAT_MESSAGE }}
+      {{ guessesSubmitted.includes(wordOfTheDay) ? VICTORY_MESSAGE : DEFEAT_MESSAGE }}
     </p>
   </main>
 </template>
