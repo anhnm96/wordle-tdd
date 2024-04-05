@@ -4,6 +4,8 @@ import { computed, nextTick, ref, triggerRef } from 'vue'
 import englishWords from '@/englishWordsWith5Letters.json'
 import GuessView from './GuessView.vue'
 
+withDefaults(defineProps<{ disabled?: boolean }>(), { disabled: false })
+
 const emit = defineEmits<{
   'guess-submitted': [guess: string]
 }>()
@@ -37,10 +39,10 @@ async function blur(event: Event) {
 </script>
 
 <template>
-  <GuessView :guess="formattedGuessInProgress" />
+  <GuessView v-if="!disabled" :guess="formattedGuessInProgress" />
 
-  <input type="text" :maxlength="WORD_SIZE" autofocus @blur="blur" v-model="formattedGuessInProgress"
-    @keydown.enter="onSubmit">
+  <input type="text" :maxlength="WORD_SIZE" :disabled="disabled" aria-label="Make your guess for the word of the day!"
+    autofocus @blur="blur" v-model="formattedGuessInProgress" @keydown.enter="onSubmit">
 </template>
 
 <style scoped>
