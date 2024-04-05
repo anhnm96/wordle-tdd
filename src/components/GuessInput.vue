@@ -10,6 +10,8 @@ const emit = defineEmits<{
   'guess-submitted': [guess: string]
 }>()
 const guessInProgress = ref<string | null>(null)
+const hasFailedValidation = ref<boolean>(false)
+
 const formattedGuessInProgress = computed<string>({
   get() {
     return guessInProgress.value ?? ''
@@ -25,7 +27,11 @@ const formattedGuessInProgress = computed<string>({
 })
 
 function onSubmit() {
-  if (!englishWords.includes(formattedGuessInProgress.value)) return
+  if (!englishWords.includes(formattedGuessInProgress.value)) {
+    hasFailedValidation.value = true
+    setTimeout(() => hasFailedValidation.value = false, 500)
+    return
+  }
   emit('guess-submitted', formattedGuessInProgress.value)
   guessInProgress.value = null
 }
@@ -39,7 +45,7 @@ async function blur(event: Event) {
 </script>
 
 <template>
-  <GuessView v-if="!disabled" :guess="formattedGuessInProgress" />
+  <GuessView v-if="!disabled" :class="{ shake: hasFailedValidation }" :guess="formattedGuessInProgress" />
 
   <input type="text" :maxlength="WORD_SIZE" :disabled="disabled" aria-label="Make your guess for the word of the day!"
     autofocus @blur="blur" v-model="formattedGuessInProgress" @keydown.enter="onSubmit">
@@ -49,5 +55,29 @@ async function blur(event: Event) {
 input {
   position: absolute;
   opacity: 0;
+}
+
+.shake {
+  animation: shake;
+  animation-duration: 100ms;
+  animation-iteration-count: 2;
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(-2%);
+  }
+
+  25% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(2%);
+  }
+
+  75% {
+    transform: translateX(0);
+  }
 }
 </style>
