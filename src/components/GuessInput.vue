@@ -24,6 +24,7 @@ const formattedGuessInProgress = computed<string>({
 function onSubmit() {
   if (!englishWords.includes(formattedGuessInProgress.value)) return
   emit('guess-submitted', formattedGuessInProgress.value)
+  guessInProgress.value = null
 }
 
 async function blur(event: Event) {
