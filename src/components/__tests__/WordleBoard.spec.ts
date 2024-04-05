@@ -1,6 +1,8 @@
 import { mount } from '@vue/test-utils'
 import WordleBoard from '../WordleBoard.vue'
 import { DEFEAT_MESSAGE, MAX_GUESSES_COUNT, VICTORY_MESSAGE, WORD_SIZE } from '@/settings'
+import GuessInput from '../GuessInput.vue'
+import { nextTick } from 'vue'
 
 describe('WordleBoard', () => {
   const wordOfTheDay = 'TESTS'
@@ -22,15 +24,15 @@ describe('WordleBoard', () => {
       expect(wrapper.text()).toContain(VICTORY_MESSAGE)
     })
 
-    describe.each([
-      { numberOfGuesses: 0, shouldSeeDefeatMessage: false },
-      { numberOfGuesses: 1, shouldSeeDefeatMessage: false },
-      { numberOfGuesses: 2, shouldSeeDefeatMessage: false },
-      { numberOfGuesses: 3, shouldSeeDefeatMessage: false },
-      { numberOfGuesses: 4, shouldSeeDefeatMessage: false },
-      { numberOfGuesses: 5, shouldSeeDefeatMessage: false },
-      { numberOfGuesses: MAX_GUESSES_COUNT, shouldSeeDefeatMessage: true }
-    ])(`a defeat message appears if the user makes incorrect guesses ${MAX_GUESSES_COUNT} times in a row`, ({ numberOfGuesses, shouldSeeDefeatMessage }) => {
+    describe.each(
+      Array.from(
+        { length: MAX_GUESSES_COUNT + 1 },
+        (_, numberOfGuesses) => ({
+          numberOfGuesses,
+          shouldSeeTheDefeatMessage: numberOfGuesses === MAX_GUESSES_COUNT
+        })
+      )
+    )(`a defeat message appears if the user makes incorrect guesses ${MAX_GUESSES_COUNT} times in a row`, ({ numberOfGuesses, shouldSeeDefeatMessage }) => {
       it(`therefore for ${numberOfGuesses} guess(es), a defeat message should ${shouldSeeDefeatMessage ? "" : "not"} appear`, async () => {
         for (let i = 0; i < numberOfGuesses; i++) {
           await playerSubmitsGuess("WRONG")
@@ -73,16 +75,19 @@ describe('WordleBoard', () => {
 
   describe('Player input', () => {
     it("remains in focus the entire time", async () => {
-      document.body.innerHTML = `<div id="app"></div>`
       wrapper = mount(WordleBoard, {
         props: { wordOfTheDay },
-        attachTo: "#app"
+        attachTo: document.body
       })
 
-      expect(wrapper.find("input[type=text]").attributes("autofocus")).not.toBeUndefined()
+      const inputEl = wrapper.find("input[type=text]")
+      expect(inputEl.attributes("autofocus")).toBeDefined()
 
-      await wrapper.find("input[type=text]").trigger("blur")
-      expect(document.activeElement).toBe(wrapper.find("input[type=text]").element)
+      await inputEl.trigger("blur")
+      await nextTick()
+      requestAnimationFrame(() => {
+        expect(document.activeElement).toBe(inputEl.element)
+      })
     })
 
     it(`player guesses are limited to ${WORD_SIZE} letters`, async () => {

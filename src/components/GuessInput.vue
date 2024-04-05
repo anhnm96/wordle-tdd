@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { WORD_SIZE } from '@/settings'
-import { computed, ref, triggerRef } from 'vue'
+import { computed, nextTick, ref, triggerRef } from 'vue'
 import englishWords from '@/englishWordsWith5Letters.json'
 
 const emit = defineEmits<{
@@ -27,7 +27,8 @@ function onSubmit() {
 }
 
 async function blur(event: Event) {
-  setTimeout(() => {
+  await nextTick()
+  requestAnimationFrame(() => {
     (event.target as HTMLInputElement).focus()
   })
 }
