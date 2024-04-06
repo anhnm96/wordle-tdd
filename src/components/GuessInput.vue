@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { WORD_SIZE } from '@/settings'
-import { computed, nextTick, ref, triggerRef } from 'vue'
+import { computed, nextTick, onMounted, ref, triggerRef } from 'vue'
 import englishWords from '@/englishWordsWith5Letters.json'
 import GuessView from './GuessView.vue'
 
@@ -36,6 +36,13 @@ function onSubmit() {
   guessInProgress.value = null
 }
 
+const inputRef = ref()
+onMounted(() => {
+  window.addEventListener('focus', () => {
+    inputRef.value.focus()
+  })
+})
+
 async function blur(event: Event) {
   await nextTick()
   requestAnimationFrame(() => {
@@ -47,8 +54,9 @@ async function blur(event: Event) {
 <template>
   <GuessView v-if="!disabled" :class="{ shake: hasFailedValidation }" :guess="formattedGuessInProgress" />
 
-  <input type="text" :maxlength="WORD_SIZE" :disabled="disabled" aria-label="Make your guess for the word of the day!"
-    autofocus @blur="blur" v-model="formattedGuessInProgress" @keydown.enter="onSubmit">
+  <input ref="inputRef" type="text" :maxlength="WORD_SIZE" :disabled="disabled"
+    aria-label="Make your guess for the word of the day!" autofocus @blur="blur" v-model="formattedGuessInProgress"
+    @keydown.enter="onSubmit">
 </template>
 
 <style scoped>
