@@ -1,13 +1,23 @@
 <script lang="ts" setup>
 import { WORD_SIZE } from "@/settings"
-withDefaults(defineProps<{ guess: string, shouldFlip?: boolean }>(), { shouldFlip: false })
+const props = defineProps<{ guess: string, answer?: string }>()
+function getFeedback(letterPosition: number): null | 'correct' | 'incorrect' | 'almost' {
+  if (!props.answer) {
+    return null
+  }
+
+  if (!props.answer.includes(props.guess[letterPosition])) {
+    return 'incorrect'
+  }
+
+  return props.answer[letterPosition] === props.guess[letterPosition] ? 'correct' : 'almost'
+}
 </script>
 
 <template>
   <ul class="word">
     <li v-for="(letter, index) in guess.padEnd(WORD_SIZE, ' ')" :key="`${letter}-${index}`" :data-letter="letter"
-      :data-letter-feedback="shouldFlip ? 'correct' : null" :class="{ 'with-flips': shouldFlip }" class="letter"
-      v-text="letter" />
+      :data-letter-feedback="getFeedback(index)" :class="{ 'with-flips': answer }" class="letter" v-text="letter" />
   </ul>
 </template>
 
