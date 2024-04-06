@@ -6,7 +6,8 @@ withDefaults(defineProps<{ guess: string, shouldFlip?: boolean }>(), { shouldFli
 <template>
   <ul class="word">
     <li v-for="(letter, index) in guess.padEnd(WORD_SIZE, ' ')" :key="`${letter}-${index}`" :data-letter="letter"
-      :class="{ 'with-flips': shouldFlip }" class="letter" v-text="letter" />
+      :data-letter-feedback="shouldFlip ? 'unknown' : null" :class="{ 'with-flips': shouldFlip }" class="letter"
+      v-text="letter" />
   </ul>
 </template>
 
